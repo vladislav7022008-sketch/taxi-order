@@ -3,141 +3,140 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Оплата в Telegram</title>
+  <title>Оформление заказа</title>
   <script src="https://telegram.org"></script>
   <style>
-    :root {
-      --bg: var(--tg-theme-bg-color, #17212b);
-      --sec-bg: var(--tg-theme-secondary-bg-color, #242f3d);
-      --text: var(--tg-theme-text-color, #ffffff);
-      --hint: var(--tg-theme-hint-color, #708499);
-      --btn: var(--tg-theme-button-color, #5288c1);
-      --btn-text: var(--tg-theme-button-text-color, #ffffff);
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-
     body {
-      background: var(--bg);
-      color: var(--text);
-      padding: 24px 16px;
+      background: radial-gradient(circle at top, #1f1b38 0%, #0d0b1a 100%);
+      color: #ffffff;
       min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
-
-    h1 {
-      font-size: 22px;
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
     .card {
-      background: var(--sec-bg);
-      border-radius: 14px;
-      padding: 18px;
-      margin-bottom: 20px;
+      width: 100%;
+      max-width: 380px;
+      background: rgba(28, 25, 48, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
     }
-
-    .row {
+    .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 12px;
+      color: #8e8aa8;
+      margin-bottom: 24px;
+      letter-spacing: 1px;
     }
-
-    .row:last-child {
-      border-bottom: none;
+    .brand {
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 3px;
     }
-
-    .label {
-      color: var(--hint);
-      font-size: 14px;
+    .product {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 24px;
     }
-
-    .value {
+    .product-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #3b336b, #231e42);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .product-title {
       font-size: 16px;
       font-weight: 600;
     }
-
+    .product-sub {
+      font-size: 12px;
+      color: #8e8aa8;
+      margin-top: 2px;
+    }
+    .price {
+      font-size: 17px;
+      font-weight: 700;
+    }
     .pay-btn {
       width: 100%;
-      background: var(--btn);
-      color: var(--btn-text);
+      background: linear-gradient(90deg, #9d8df1 0%, #c4b5fd 50%, #9d8df1 100%);
+      color: #131026;
       border: none;
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 16px;
+      padding: 18px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
     }
-
+    .pay-btn:active {
+      transform: scale(0.98);
+    }
     .pay-btn:disabled {
       opacity: 0.6;
+      cursor: not-allowed;
     }
-
-    #status {
+    .status {
       text-align: center;
-      margin-top: 16px;
-      font-size: 14px;
-      color: #ff595a;
+      font-size: 13px;
+      margin-top: 14px;
+      color: #ff6b6b;
     }
-
-    #success-box {
-      display: none;
-      text-align: center;
-      padding-top: 22vh;
-    }
-
-    .check {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: #2ea043;
-      color: #fff;
-      font-size: 32px;
-      line-height: 64px;
-      margin: 0 auto 16px;
+    .status.ok {
+      color: #4ade80;
     }
   </style>
 </head>
 <body>
 
-  <div id="main-box">
-    <h1>Оплата заказа</h1>
-
-    <div class="card">
-      <div class="row">
-        <span class="label">Услуга</span>
-        <span class="value">Оплата заказа</span>
-      </div>
-      <div class="row">
-        <span class="label">Способ оплаты</span>
-        <span class="value">Банковская карта</span>
-      </div>
-      <div class="row">
-        <span class="label">Итого к оплате</span>
-        <span class="value">500.00 RUB</span>
-      </div>
+  <div class="card">
+    <div class="header">
+      <span class="brand">CLARA</span>
+      <span>Оформление заказа</span>
     </div>
 
-    <button class="pay-btn" id="pay-btn">Оплатить картой</button>
-    <div id="status"></div>
-  </div>
+    <div class="product">
+      <div class="product-left">
+        <div class="icon-box">🎧</div>
+        <div>
+          <div class="product-title">Aura One</div>
+          <div class="product-sub">наушники • устройство</div>
+        </div>
+      </div>
+      <div class="price">45 000 ₸</div>
+    </div>
 
-  <div id="success-box">
-    <div class="check">✓</div>
-    <h2>Оплата прошла успешно!</h2>
-    <p style="color: var(--hint); margin-top: 8px;">Окно закроется автоматически...</p>
+    <button class="pay-btn" id="pay-btn">Оплатить 45 000 ₸</button>
+    <div class="status" id="status"></div>
   </div>
 
   <script>
-    // Вставьте сюда ссылку вида https://t.me... полученную на Шаге 1
-    const INVOICE_LINK = "https://t.meВАША_ССЫЛКА_НА_СЧЕТ";
+    // HTTPS-адрес вашего сервера, где запущен bot.py
+    const SERVER_URL = "https://ВАШ_ДОМЕН_СЕРВЕРА/create-invoice";
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
     if (tg) {
@@ -145,37 +144,57 @@
       tg.expand();
     }
 
-    const payBtn = document.getElementById("pay-btn");
+    const btn = document.getElementById("pay-btn");
     const statusEl = document.getElementById("status");
 
-    payBtn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       if (!tg || !tg.openInvoice) {
-        statusEl.textContent = "Откройте это приложение внутри Telegram";
+        statusEl.textContent = "Откройте страницу внутри Telegram";
         return;
       }
 
-      if (INVOICE_LINK.includes("ВАША_ССЫЛКА")) {
-        statusEl.textContent = "Не указана ссылка на счёт INVOICE_LINK";
-        return;
-      }
-
-      payBtn.disabled = true;
+      btn.disabled = true;
+      btn.textContent = "Создание счёта...";
       statusEl.textContent = "";
 
-      // Открывает нативное окно оплаты картой прямо внутри Telegram
-      tg.openInvoice(INVOICE_LINK, (status) => {
-        payBtn.disabled = false;
+      try {
+        const res = await fetch(SERVER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: "Aura One",
+            description: "Наушники • устройство",
+            amount: 45000
+          })
+        });
 
-        if (status === "paid") {
-          document.getElementById("main-box").style.display = "none";
-          document.getElementById("success-box").style.display = "block";
-          setTimeout(() => tg.close(), 2500);
-        } else if (status === "cancelled") {
-          statusEl.textContent = "Оплата отменена";
-        } else if (status === "failed") {
-          statusEl.textContent = "Ошибка оплаты. Проверьте данные карты.";
+        const data = await res.json();
+        if (!data.ok || !data.invoice_link) {
+          throw new Error(data.error || "Ошибка создания счёта");
         }
-      });
+
+        tg.openInvoice(data.invoice_link, (status) => {
+          btn.disabled = false;
+          btn.textContent = "Оплатить 45 000 ₸";
+
+          if (status === "paid") {
+            statusEl.className = "status ok";
+            statusEl.textContent = "Оплата прошла успешно!";
+            setTimeout(() => tg.close(), 2000);
+          } else if (status === "cancelled") {
+            statusEl.className = "status";
+            statusEl.textContent = "Оплата отменена";
+          } else {
+            statusEl.className = "status";
+            statusEl.textContent = "Не удалось провести платёж";
+          }
+        });
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = "Оплатить 45 000 ₸";
+        statusEl.className = "status";
+        statusEl.textContent = "Ошибка: " + err.message;
+      }
     });
   </script>
 </body>
