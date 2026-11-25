@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Оплата заказа</title>
+  <title>Оплата в Telegram</title>
   <script src="https://telegram.org"></script>
   <style>
     :root {
@@ -14,45 +14,130 @@
       --btn: var(--tg-theme-button-color, #5288c1);
       --btn-text: var(--tg-theme-button-text-color, #ffffff);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding: 24px 16px; min-height: 100vh; }
-    h1 { font-size: 22px; text-align: center; margin-bottom: 24px; }
-    .card { background: var(--sec-bg); border-radius: 14px; padding: 16px; margin-bottom: 20px; }
-    label { display: block; font-size: 12px; color: var(--hint); text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
-    input {
-      width: 100%; background: var(--bg); color: var(--text);
-      border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
-      padding: 14px; font-size: 16px; outline: none; margin-bottom: 14px;
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-    input:focus { border-color: var(--btn); }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px 16px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 22px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--sec-bg);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .row:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      color: var(--hint);
+      font-size: 14px;
+    }
+
+    .value {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
     .pay-btn {
-      width: 100%; background: var(--btn); color: var(--btn-text);
-      border: none; border-radius: 12px; padding: 16px;
-      font-size: 16px; font-weight: 600; cursor: pointer;
+      width: 100%;
+      background: var(--btn);
+      color: var(--btn-text);
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
     }
-    .pay-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .status { text-align: center; margin-top: 14px; font-size: 14px; color: #ff595a; }
-    .status.success { color: #2ea043; font-weight: 600; }
+
+    .pay-btn:disabled {
+      opacity: 0.6;
+    }
+
+    #status {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 14px;
+      color: #ff595a;
+    }
+
+    #success-box {
+      display: none;
+      text-align: center;
+      padding-top: 22vh;
+    }
+
+    .check {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #2ea043;
+      color: #fff;
+      font-size: 32px;
+      line-height: 64px;
+      margin: 0 auto 16px;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Оплата услуг</h1>
+  <div id="main-box">
+    <h1>Оплата заказа</h1>
 
-  <div class="card">
-    <label for="service">Назначение платежа</label>
-    <input type="text" id="service" value="Оплата заказа" />
+    <div class="card">
+      <div class="row">
+        <span class="label">Услуга</span>
+        <span class="value">Оплата заказа</span>
+      </div>
+      <div class="row">
+        <span class="label">Способ оплаты</span>
+        <span class="value">Банковская карта</span>
+      </div>
+      <div class="row">
+        <span class="label">Итого к оплате</span>
+        <span class="value">500.00 RUB</span>
+      </div>
+    </div>
 
-    <label for="amount">Сумма к оплате (RUB)</label>
-    <input type="number" id="amount" value="500" min="1" />
+    <button class="pay-btn" id="pay-btn">Оплатить картой</button>
+    <div id="status"></div>
   </div>
 
-  <button class="pay-btn" id="pay-btn">Оплатить картой</button>
-  <div class="status" id="status-msg"></div>
+  <div id="success-box">
+    <div class="check">✓</div>
+    <h2>Оплата прошла успешно!</h2>
+    <p style="color: var(--hint); margin-top: 8px;">Окно закроется автоматически...</p>
+  </div>
 
   <script>
-    // Укажите HTTPS-адрес вашего сервера, где запущен bot.js
-    const BACKEND_URL = "https://ВАШ_ДОМЕН_СЕРВЕРА/create-invoice";
+    // Вставьте сюда ссылку вида https://t.me... полученную на Шаге 1
+    const INVOICE_LINK = "https://t.meВАША_ССЫЛКА_НА_СЧЕТ";
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
     if (tg) {
@@ -61,69 +146,36 @@
     }
 
     const payBtn = document.getElementById("pay-btn");
-    const statusMsg = document.getElementById("status-msg");
+    const statusEl = document.getElementById("status");
 
-    payBtn.addEventListener("click", async () => {
-      const title = document.getElementById("service").value.trim();
-      const amount = parseFloat(document.getElementById("amount").value);
-
-      if (!title || isNaN(amount) || amount <= 0) {
-        statusMsg.className = "status";
-        statusMsg.textContent = "Укажите корректное назначение и сумму";
+    payBtn.addEventListener("click", () => {
+      if (!tg || !tg.openInvoice) {
+        statusEl.textContent = "Откройте это приложение внутри Telegram";
         return;
       }
 
-      if (!tg || !tg.openInvoice) {
-        statusMsg.className = "status";
-        statusMsg.textContent = "Откройте страницу внутри Telegram";
+      if (INVOICE_LINK.includes("ВАША_ССЫЛКА")) {
+        statusEl.textContent = "Не указана ссылка на счёт INVOICE_LINK";
         return;
       }
 
       payBtn.disabled = true;
-      payBtn.textContent = "Подготовка счёта...";
-      statusMsg.textContent = "";
+      statusEl.textContent = "";
 
-      try {
-        const response = await fetch(BACKEND_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: title,
-            amount: amount,
-            currency: "RUB",
-            payload: `order_${Date.now()}`
-          })
-        });
-
-        const data = await response.json();
-
-        if (!data.ok || !data.invoiceLink) {
-          throw new Error(data.error || "Не удалось создать счёт");
-        }
-
-        // Открытие защищённого окна оплаты Telegram
-        tg.openInvoice(data.invoiceLink, (status) => {
-          payBtn.disabled = false;
-          payBtn.textContent = "Оплатить картой";
-
-          if (status === "paid") {
-            statusMsg.className = "status success";
-            statusMsg.textContent = "Оплата успешно выполнена!";
-            setTimeout(() => tg.close(), 2000);
-          } else if (status === "cancelled") {
-            statusMsg.className = "status";
-            statusMsg.textContent = "Оплата отменена пользователем";
-          } else if (status === "failed") {
-            statusMsg.className = "status";
-            statusMsg.textContent = "Ошибка при проведении платежа";
-          }
-        });
-      } catch (err) {
+      // Открывает нативное окно оплаты картой прямо внутри Telegram
+      tg.openInvoice(INVOICE_LINK, (status) => {
         payBtn.disabled = false;
-        payBtn.textContent = "Оплатить картой";
-        statusMsg.className = "status";
-        statusMsg.textContent = "Ошибка: " + err.message;
-      }
+
+        if (status === "paid") {
+          document.getElementById("main-box").style.display = "none";
+          document.getElementById("success-box").style.display = "block";
+          setTimeout(() => tg.close(), 2500);
+        } else if (status === "cancelled") {
+          statusEl.textContent = "Оплата отменена";
+        } else if (status === "failed") {
+          statusEl.textContent = "Ошибка оплаты. Проверьте данные карты.";
+        }
+      });
     });
   </script>
 </body>
