@@ -1,35 +1,130 @@
-const { Telegraf } = require('telegraf');
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Оплата заказа</title>
+  <script src="https://telegram.org"></script>
+  <style>
+    :root {
+      --bg: var(--tg-theme-bg-color, #17212b);
+      --sec-bg: var(--tg-theme-secondary-bg-color, #242f3d);
+      --text: var(--tg-theme-text-color, #ffffff);
+      --hint: var(--tg-theme-hint-color, #708499);
+      --btn: var(--tg-theme-button-color, #5288c1);
+      --btn-text: var(--tg-theme-button-text-color, #ffffff);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 24px 16px; min-height: 100vh; }
+    h1 { font-size: 22px; text-align: center; margin-bottom: 24px; }
+    .card { background: var(--sec-bg); border-radius: 14px; padding: 16px; margin-bottom: 20px; }
+    label { display: block; font-size: 12px; color: var(--hint); text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+    input {
+      width: 100%; background: var(--bg); color: var(--text);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+      padding: 14px; font-size: 16px; outline: none; margin-bottom: 14px;
+    }
+    input:focus { border-color: var(--btn); }
+    .pay-btn {
+      width: 100%; background: var(--btn); color: var(--btn-text);
+      border: none; border-radius: 12px; padding: 16px;
+      font-size: 16px; font-weight: 600; cursor: pointer;
+    }
+    .pay-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .status { text-align: center; margin-top: 14px; font-size: 14px; color: #ff595a; }
+    .status.success { color: #2ea043; font-weight: 600; }
+  </style>
+</head>
+<body>
 
-// Токен бота и токен платёжного провайдера из @BotFather
-const bot = new Telegraf('ВАШ_BOT_TOKEN');
-const PROVIDER_TOKEN = 'ВАШ_PROVIDER_TOKEN';
+  <h1>Оплата услуг</h1>
 
-// Команда для выставления счёта на оплату
-bot.command('pay', (ctx) => {
-  return ctx.replyWithInvoice({
-    title: 'Оплата заказа',
-    description: 'Оплата услуг через официальный шлюз Telegram',
-    payload: 'order_12345', // Внутренний ID заказа для вашей базы
-    provider_token: PROVIDER_TOKEN,
-    currency: 'RUB', // Или UAH, USD, EUR в зависимости от провайдера
-    prices: [
-      { label: 'Стоимость услуги', amount: 50000 } // Сумма в копейках/центах (500.00)
-    ],
-    need_phone_number: true, // Запросить телефон для чека при необходимости
-    send_phone_number_to_provider: true
-  });
-});
+  <div class="card">
+    <label for="service">Назначение платежа</label>
+    <input type="text" id="service" value="Оплата заказа" />
 
-// Обязательное подтверждение перед списанием средств
-bot.on('pre_checkout_query', (ctx) => {
-  return ctx.answerPreCheckoutQuery(true);
-});
+    <label for="amount">Сумма к оплате (RUB)</label>
+    <input type="number" id="amount" value="500" min="1" />
+  </div>
 
-// Обработка успешного платежа
-bot.on('successful_payment', (ctx) => {
-  const payment = ctx.message.successful_payment;
-  console.log('Оплата прошла успешно:', payment);
-  ctx.reply(`Оплата на сумму ${payment.total_amount / 100} ${payment.currency} успешно принята!`);
-});
+  <button class="pay-btn" id="pay-btn">Оплатить картой</button>
+  <div class="status" id="status-msg"></div>
 
-bot.launch();
+  <script>
+    // Укажите HTTPS-адрес вашего сервера, где запущен bot.js
+    const BACKEND_URL = "https://ВАШ_ДОМЕН_СЕРВЕРА/create-invoice";
+
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    const payBtn = document.getElementById("pay-btn");
+    const statusMsg = document.getElementById("status-msg");
+
+    payBtn.addEventListener("click", async () => {
+      const title = document.getElementById("service").value.trim();
+      const amount = parseFloat(document.getElementById("amount").value);
+
+      if (!title || isNaN(amount) || amount <= 0) {
+        statusMsg.className = "status";
+        statusMsg.textContent = "Укажите корректное назначение и сумму";
+        return;
+      }
+
+      if (!tg || !tg.openInvoice) {
+        statusMsg.className = "status";
+        statusMsg.textContent = "Откройте страницу внутри Telegram";
+        return;
+      }
+
+      payBtn.disabled = true;
+      payBtn.textContent = "Подготовка счёта...";
+      statusMsg.textContent = "";
+
+      try {
+        const response = await fetch(BACKEND_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: title,
+            amount: amount,
+            currency: "RUB",
+            payload: `order_${Date.now()}`
+          })
+        });
+
+        const data = await response.json();
+
+        if (!data.ok || !data.invoiceLink) {
+          throw new Error(data.error || "Не удалось создать счёт");
+        }
+
+        // Открытие защищённого окна оплаты Telegram
+        tg.openInvoice(data.invoiceLink, (status) => {
+          payBtn.disabled = false;
+          payBtn.textContent = "Оплатить картой";
+
+          if (status === "paid") {
+            statusMsg.className = "status success";
+            statusMsg.textContent = "Оплата успешно выполнена!";
+            setTimeout(() => tg.close(), 2000);
+          } else if (status === "cancelled") {
+            statusMsg.className = "status";
+            statusMsg.textContent = "Оплата отменена пользователем";
+          } else if (status === "failed") {
+            statusMsg.className = "status";
+            statusMsg.textContent = "Ошибка при проведении платежа";
+          }
+        });
+      } catch (err) {
+        payBtn.disabled = false;
+        payBtn.textContent = "Оплатить картой";
+        statusMsg.className = "status";
+        statusMsg.textContent = "Ошибка: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
