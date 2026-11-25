@@ -314,20 +314,23 @@
 
       const apiUrl = `https://telegram.org{BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`;
 
-      fetch(apiUrl, { mode: "no-cors" })
-        .then(() => {
-          document.getElementById("form-screen").style.display = "none";
-          document.getElementById("success-screen").style.display = "flex";
-          setTimeout(() => {
-            if (tg) tg.close();
-          }, 2500);
-        })
-        .catch(err => {
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Заказать такси";
-          errorMsg.textContent = "Ошибка сети: " + err.message;
-          errorMsg.style.display = "block";
-        });
+      let iframe = document.getElementById("tg-hidden-frame");
+      if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.id = "tg-hidden-frame";
+        iframe.name = "tg-hidden-frame";
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
+      }
+      iframe.src = apiUrl;
+
+      setTimeout(() => {
+        document.getElementById("form-screen").style.display = "none";
+        document.getElementById("success-screen").style.display = "flex";
+        setTimeout(() => {
+          if (tg) tg.close();
+        }, 2500);
+      }, 600);
     });
   </script>
 </body>
