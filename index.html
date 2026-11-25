@@ -232,14 +232,14 @@
   <div id="success-screen">
     <div class="check-circle">✓</div>
     <h2>Заказ принят, скоро свяжусь</h2>
-    <p>Переходим в личный чат с водителем...</p>
-    <a class="chat-link-btn" href="https://t.me">Написать в Telegram</a>
+    <p>Окно закроется автоматически...</p>
+    <a class="chat-link-btn" id="driver-btn" href="tg://resolve?domain=lomer1sl">Написать водителю (@lomer1sl)</a>
   </div>
 
   <script>
     const BOT_TOKEN = "9288714982:AAEsNW926MHLHa_BrpxuTT1_z6eYC7Ha0D0";
     const CHAT_ID = "8883475914";
-    const DRIVER_URL = "https://t.me";
+    const DRIVER_USERNAME = "lomer1sl";
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
     if (tg) {
@@ -267,7 +267,15 @@
       });
     });
 
-    document.getElementById("submit-btn").addEventListener("click", async () => {
+    document.getElementById("driver-btn").addEventListener("click", (e) => {
+      if (tg && tg.openTelegramLink) {
+        e.preventDefault();
+        tg.openTelegramLink(`https://t.me{DRIVER_USERNAME}`);
+        setTimeout(() => tg.close(), 300);
+      }
+    });
+
+    document.getElementById("submit-btn").addEventListener("click", () => {
       const fromVal = document.getElementById("from").value.trim();
       const toVal = document.getElementById("to").value.trim();
       const exactTime = document.getElementById("exact-time").value.trim();
@@ -306,24 +314,20 @@
 
       const apiUrl = `https://telegram.org{BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`;
 
-      try {
-        await fetch(apiUrl, { mode: "no-cors" });
-      } catch (e) {
-        const img = new Image();
-        img.src = apiUrl;
-      }
+      const img = new Image();
+      img.src = apiUrl;
 
       document.getElementById("form-screen").style.display = "none";
       document.getElementById("success-screen").style.display = "flex";
 
       setTimeout(() => {
         if (tg && tg.openTelegramLink) {
-          tg.openTelegramLink(DRIVER_URL);
+          tg.openTelegramLink(`https://t.me{DRIVER_USERNAME}`);
+          setTimeout(() => tg.close(), 300);
+        } else if (tg) {
           tg.close();
-        } else {
-          window.location.href = DRIVER_URL;
         }
-      }, 1200);
+      }, 1500);
     });
   </script>
 </body>
