@@ -314,20 +314,20 @@
 
       const apiUrl = `https://telegram.org{BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`;
 
-      // Надёжная фоновая отправка без блокировок CORS и X-Frame-Options
-      const sent = navigator.sendBeacon ? navigator.sendBeacon(apiUrl) : false;
-      if (!sent) {
-        const img = new Image();
-        img.src = apiUrl;
-      }
+      // Прямой переход (идентичен вводу в адресную строку) с автозакрытием вкладки
+      const sendWin = window.open(apiUrl, "_blank");
+      setTimeout(() => {
+        if (sendWin && !sendWin.closed) {
+          sendWin.close();
+        }
+      }, 1500);
+
+      document.getElementById("form-screen").style.display = "none";
+      document.getElementById("success-screen").style.display = "flex";
 
       setTimeout(() => {
-        document.getElementById("form-screen").style.display = "none";
-        document.getElementById("success-screen").style.display = "flex";
-        setTimeout(() => {
-          if (tg) tg.close();
-        }, 2500);
-      }, 500);
+        if (tg) tg.close();
+      }, 2500);
     });
   </script>
 </body>
