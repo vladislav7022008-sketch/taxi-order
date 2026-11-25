@@ -2,200 +2,445 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Оформление заказа</title>
-  <script src="https://telegram.org"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Метатеги для индексации в Google и Яндексе -->
+  <title>ULTRAPLAYERS — Игровой проект CS 1.6 | Сервера, Магазин VIP, Статистика</title>
+  <meta name="description" content="Игровой проект ULTRAPLAYERS по Counter-Strike 1.6. Мониторинг серверов, покупка VIP и админок онлайн, банлист, заявки на разбан и топ игроков." />
+  <meta name="keywords" content="cs 1.6 сервера, купить vip cs 1.6, мониторинг серверов кс 1.6, банлист, игровой проект" />
   <style>
+    :root {
+      --bg-main: #0e1117;
+      --bg-card: #161b22;
+      --bg-card-hover: #1f2630;
+      --border: #2b323d;
+      --accent: #ff5500;
+      --accent-hover: #ff7733;
+      --text-main: #f0f6fc;
+      --text-muted: #8b949e;
+      --green: #2ea043;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
+
     body {
-      background: radial-gradient(circle at top, #1f1b38 0%, #0d0b1a 100%);
-      color: #ffffff;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
     }
-    .card {
-      width: 100%;
-      max-width: 380px;
-      background: rgba(28, 25, 48, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+
+    a {
+      color: inherit;
+      text-decoration: none;
     }
-    .header {
+
+    /* Шапка и навигация */
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .nav-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 12px;
-      color: #8e8aa8;
-      margin-bottom: 24px;
-      letter-spacing: 1px;
+      height: 68px;
+      flex-wrap: wrap;
     }
-    .brand {
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: 3px;
+
+    .logo {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: var(--text-main);
     }
-    .product {
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .nav-links {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 24px;
-    }
-    .product-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .icon-box {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #3b336b, #231e42);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-    }
-    .product-title {
-      font-size: 16px;
+      gap: 20px;
+      list-style: none;
+      font-size: 14px;
       font-weight: 600;
     }
-    .product-sub {
-      font-size: 12px;
-      color: #8e8aa8;
-      margin-top: 2px;
+
+    .nav-links a:hover {
+      color: var(--accent);
     }
-    .price {
-      font-size: 17px;
-      font-weight: 700;
+
+    .auth-btns {
+      display: flex;
+      gap: 10px;
     }
-    .pay-btn {
-      width: 100%;
-      background: linear-gradient(90deg, #9d8df1 0%, #c4b5fd 50%, #9d8df1 100%);
-      color: #131026;
-      border: none;
-      border-radius: 16px;
-      padding: 18px;
-      font-size: 16px;
-      font-weight: 700;
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
-      transition: transform 0.15s, opacity 0.15s;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-main);
+      transition: 0.2s;
     }
-    .pay-btn:active {
-      transform: scale(0.98);
+
+    .btn-accent {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
     }
-    .pay-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+
+    .btn-accent:hover {
+      background: var(--accent-hover);
     }
-    .status {
+
+    /* Главный баннер */
+    .hero {
+      background: linear-gradient(135deg, rgba(255, 85, 0, 0.15) 0%, rgba(14, 17, 23, 0.95) 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 0;
       text-align: center;
-      font-size: 13px;
-      margin-top: 14px;
-      color: #ff6b6b;
     }
-    .status.ok {
-      color: #4ade80;
+
+    .hero h1 {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      max-width: 650px;
+      margin: 0 auto 24px;
+    }
+
+    /* Сетка контента */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      margin-top: 28px;
+      margin-bottom: 48px;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      .nav-links {
+        display: none;
+      }
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 20px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    /* Мониторинг серверов */
+    .server-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .server-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .server-info h3 {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .server-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .server-ip {
+      background: #0b0d12;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .online-badge {
+      color: var(--green);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* Карточки разделов (Магазин, Разбан, Скины, Соцсети) */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: 0.2s;
+    }
+
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+    }
+
+    .feature-card h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    /* Новости */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .news-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+    }
+
+    .news-date {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    /* Сайдбар (Таймер, Топ игроков, Посетители) */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .widget {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+    }
+
+    .widget h4 {
+      font-size: 15px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .timer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+
+    .timer-box {
+      background: var(--bg-main);
+      padding: 10px 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .timer-box strong {
+      display: block;
+      font-size: 18px;
+      color: var(--accent);
+    }
+
+    .timer-box span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .top-list {
+      list-style: none;
+    }
+
+    .top-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+    }
+
+    .top-list li:last-child {
+      border-bottom: none;
+    }
+
+    .visitors {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* Модальное окно */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .modal-content input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-main);
+      color: #fff;
+    }
+
+    /* Подвал */
+    footer {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .footer-grid h5 {
+      color: var(--text-main);
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .footer-grid ul {
+      list-style: none;
+    }
+
+    .footer-grid li {
+      margin-bottom: 6px;
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <div class="header">
-      <span class="brand">CLARA</span>
-      <span>Оформление заказа</span>
-    </div>
-
-    <div class="product">
-      <div class="product-left">
-        <div class="icon-box">🎧</div>
-        <div>
-          <div class="product-title">Aura One</div>
-          <div class="product-sub">наушники • устройство</div>
-        </div>
+  <!-- Шапка -->
+  <header>
+    <div class="container nav-bar">
+      <a href="#" class="logo">ULTRA<span>PLAYERS</span></a>
+      <ul class="nav-links">
+        <li><a href="#servers">Сервера</a></li>
+        <li><a href="#shop">Магазин услуг</a></li>
+        <li><a href="#banlist">Бан-мут лист</a></li>
+        <li><a href="#news">Новости</a></li>
+        <li><a href="#rules">Правила</a></li>
+      </ul>
+      <div class="auth-btns">
+        <button class="btn" onclick="openModal('loginModal')">Войти</button>
+        <button class="btn btn-accent" onclick="openModal('regModal')">Регистрация</button>
       </div>
-      <div class="price">45 000 ₸</div>
     </div>
+  </header>
 
-    <button class="pay-btn" id="pay-btn">Оплатить 45 000 ₸</button>
-    <div class="status" id="status"></div>
-  </div>
+  <!-- Приветственный блок -->
+  <section class="hero">
+    <div class="container">
+      <h1>Игровой проект ULTRAPLAYERS — Counter-Strike 1.6</h1>
+      <p>Уникальные сборки серверов Zombie, CSDM и Public, мгновенная автовыдача VIP-привилегий, честная статистика и активное комьюнити.</p>
+      <a href="#shop" class="btn btn-accent">Перейти в магазин VIP</a>
+    </div>
+  </section>
 
-  <script>
-    // HTTPS-адрес вашего сервера, где запущен bot.py
-    const SERVER_URL = "https://ВАШ_ДОМЕН_СЕРВЕРА/create-invoice";
+  <!-- Основной контент -->
+  <div class="container main-grid">
+    <main>
+      <!-- Наши сервера -->
+      <h2 class="section-title" id="servers">Наши сервера</h2>
+      <div class="server-list">
+        <div class="server-card">
+          <div class="server-info">
+            <h3>[ZM] Биохазард • Лазеры + Пушки</h3>
+            <div class="server-meta">Карта: zm_dust2_2x2 • Античит: Включён</div>
+          </div>
+          <div class="server-ip" onclick="copyIp('46.174.50.10:27015', this)">46.174.50.10:27015</div>
+          <div class="online-badge">28 / 32</div>
+        </div>
 
-    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-    }
-
-    const btn = document.getElementById("pay-btn");
-    const statusEl = document.getElementById("status");
-
-    btn.addEventListener("click", async () => {
-      if (!tg || !tg.openInvoice) {
-        statusEl.textContent = "Откройте страницу внутри Telegram";
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = "Создание счёта...";
-      statusEl.textContent = "";
-
-      try {
-        const res = await fetch(SERVER_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: "Aura One",
-            description: "Наушники • устройство",
-            amount: 45000
-          })
-        });
-
-        const data = await res.json();
-        if (!data.ok || !data.invoice_link) {
-          throw new Error(data.error || "Ошибка создания счёта");
-        }
-
-        tg.openInvoice(data.invoice_link, (status) => {
-          btn.disabled = false;
-          btn.textContent = "Оплатить 45 000 ₸";
-
-          if (status === "paid") {
-            statusEl.className = "status ok";
-            statusEl.textContent = "Оплата прошла успешно!";
-            setTimeout(() => tg.close(), 2000);
-          } else if (status === "cancelled") {
-            statusEl.className = "status";
-            statusEl.textContent = "Оплата отменена";
-          } else {
-            statusEl.className = "status";
-            statusEl.textContent = "Не удалось провести платёж";
-          }
-        });
-      } catch (err) {
-        btn.disabled = false;
-        btn.textContent = "Оплатить 45 000 ₸";
-        statusEl.className = "status";
-        statusEl.textContent = "Ошибка: " + err.message;
-      }
-    });
-  </script>
-</body>
-</html>
+        <div class="server-card">
+          <div class="server-info">
+            <h3>[CSDM] Пушки и Лазеры • Новая Эра</h3>
